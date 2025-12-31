@@ -14,4 +14,7 @@ export const auth = betterAuth({
 		transaction: true,
 	}),
 	plugins: [anonymous(), admin(), openAPI()],
+	experimental: {
+		joins: true,
+	},
 });
