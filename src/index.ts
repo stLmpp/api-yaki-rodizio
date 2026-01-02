@@ -4,10 +4,12 @@ import openapi from '@elysiajs/openapi';
 import { authModule } from './features/core/auth.module.js';
 import Elysia from 'elysia';
 
+const plugins = [openapi()];
+const features = [authModule(), orderModule()];
+
 export default new Elysia({
 	adapter: CloudflareAdapter,
 })
-	.use(openapi())
-	.use(authModule)
-	.use(orderModule)
+	.use(plugins)
+	.use(features)
 	.compile();

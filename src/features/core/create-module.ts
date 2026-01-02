@@ -7,8 +7,7 @@ import { env } from 'cloudflare:workers';
 export function createModule<const BasePath extends string = ''>(
 	config?: ElysiaConfig<BasePath>,
 ) {
-	return new Elysia(config).use(authModule).derive(() => {
-		console.log('Creating database connection...');
+	return new Elysia(config).use(authModule()).derive(() => {
 		const { db, client } = createDb(env.DATABASE_URL);
 		return { db, dbClient: client };
 	});

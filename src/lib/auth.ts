@@ -1,31 +1,10 @@
-import { betterAuth } from 'better-auth';
-import { admin, anonymous, openAPI } from 'better-auth/plugins';
-import { Kysely } from 'kysely';
-import { PostgresJSDialect } from 'kysely-postgres-js';
-import postgres from 'postgres';
+import { createAuth } from './create-auth.js';
 
-export const auth = (env: Env) =>
-	betterAuth({
-		basePath: '/v1/auth',
-		database: {
-			db: new Kysely({
-				dialect: new PostgresJSDialect({
-					postgres: postgres(env.DATABASE_URL),
-				}),
-				log: ['query', 'error'],
-			}),
-			type: 'postgres',
-			casing: 'snake',
-			transaction: true,
-			debugLogs: true,
-		},
-		plugins: [anonymous(), admin(), openAPI()],
-		experimental: {
-			joins: true,
-		},
-	});
-
-export enum AuthRole {
-	Admin = 'admin',
-	User = 'user',
-}
+// Variable used by the better-auth cli to generate migrations
+export const auth = await createAuth({
+	redisPort: process.env.REDIS_PORT,
+	redisPassword: process.env.REDIS_PASSWORD,
+	connectionString: process.env.DATABASE_URL,
+	redisHost: process.env.REDIS_HOST,
+	redisUsername: process.env.REDIS_USERNAME,
+});
