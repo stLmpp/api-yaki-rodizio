@@ -15,4 +15,18 @@ export default defineConfig(
 			},
 		},
 	},
+	{
+		rules: {
+			'@typescript-eslint/prefer-nullish-coalescing': 'off',
+			'@typescript-eslint/restrict-template-expressions': {
+				allowAny: true,
+				allowNumber: true,
+				allowArray: true,
+				allowBoolean: true,
+				allowNever: true,
+				allowNullish: true,
+				allowRegExp: true,
+			},
+		},
+	},
 );

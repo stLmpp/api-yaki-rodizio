@@ -1,14 +1,24 @@
-import { drizzle } from 'drizzle-orm/node-postgres';
+import { drizzle } from 'drizzle-orm/postgres-js';
 import * as schema from './schemas.js';
 import { relations } from './relations.js';
-import pg from 'pg';
+import postgres from 'postgres';
 
-const pool = new pg.Pool({
-	connectionString: process.env.DATABASE_URL!,
-});
+export function createDb(connectionString: string) {
+	const pool = postgres(connectionString);
 
-export const db = drizzle({
-	schema,
-	relations,
-	client: pool,
-});
+	return {
+		db: Object.assign(
+			drizzle({
+				schema,
+				relations,
+				client: pool,
+				casing: 'snake_case',
+				logger: true,
+			}),
+			{
+				schema,
+			},
+		),
+		client: pool,
+	};
+}
