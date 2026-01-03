@@ -131,6 +131,14 @@ export class NullGenerator extends AbstractGenerator<{}> {
 						}),
 					},
 				},
+				roundItem: {
+					...tables.roundItem,
+					columns: {
+						quantity: r.int({ minValue: 1, maxValue: 100 }),
+						...tables.roundItem.columns,
+					},
+					count: 200,
+				},
 			};
 		});
 	} catch (e) {

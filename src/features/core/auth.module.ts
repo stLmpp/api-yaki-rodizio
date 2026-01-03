@@ -5,23 +5,21 @@ import { AuthRole, createAuth as _createAuth } from '../../lib/create-auth.js';
 
 function createAuth() {
 	return _createAuth({
-		redisPort: env.REDIS_PORT,
-		redisPassword: env.REDIS_PASSWORD,
 		connectionString: env.BETTER_AUTH_DATABASE_URL,
-		redisHost: env.REDIS_HOST,
-		redisUsername: env.REDIS_USERNAME,
+		redisToken: env.UPSTASH_REDIS_REST_TOKEN,
+		redisUrl: env.UPSTASH_REDIS_REST_URL,
 	});
 }
 
 export function authModule() {
 	return new Elysia({ name: 'auth' })
 		.mount(async (request) => {
-			const betterAuth = await createAuth();
+			const betterAuth = createAuth();
 			return betterAuth.handler(request);
 		})
 		.macro('auth', (role: AuthRole | AuthRole[] | true) => ({
 			async resolve({ status, request: { headers } }) {
-				const betterAuth = await createAuth();
+				const betterAuth = createAuth();
 				const session = await betterAuth.api.getSession({
 					headers,
 				});

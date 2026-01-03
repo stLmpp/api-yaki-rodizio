@@ -5,6 +5,10 @@ import { authModule } from './features/core/auth.module.js';
 import { roundModule } from './features/round/round.module.js';
 import { z, ZodAny } from 'zod';
 
+(BigInt.prototype as any).toJSON = function () {
+	return String(this);
+};
+
 const plugins = [
 	openapi({
 		provider: 'swagger-ui',

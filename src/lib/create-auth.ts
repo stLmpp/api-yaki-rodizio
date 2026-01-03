@@ -1,4 +1,4 @@
-import { createClient } from 'redis';
+import { Redis } from '@upstash/redis/cloudflare';
 import { betterAuth } from 'better-auth';
 import { PostgresJSDialect } from 'kysely-postgres-js';
 import postgres from 'postgres';
@@ -8,28 +8,23 @@ import { env } from 'cloudflare:workers';
 
 interface CreateAuthOptions {
 	connectionString?: string;
-	redisUsername?: string;
-	redisPassword?: string;
-	redisHost?: string;
-	redisPort?: number | string;
+	redisToken?: string;
+	redisUrl?: string;
 }
 
-export async function createAuth(options?: CreateAuthOptions) {
+export function createAuth(options?: CreateAuthOptions) {
 	options ??= {};
 	options.connectionString ??= env.BETTER_AUTH_DATABASE_URL;
-	options.redisUsername ??= env.REDIS_USERNAME;
-	options.redisPassword ??= env.REDIS_PASSWORD;
-	options.redisHost ??= env.REDIS_HOST;
-	options.redisPort = Number(options.redisPort ?? env.REDIS_PORT);
-	const client = createClient({
-		username: options.redisUsername,
-		password: options.redisPassword,
-		socket: {
-			host: options.redisHost,
-			port: options.redisPort,
-		},
+	options.redisToken ??= env.UPSTASH_REDIS_REST_TOKEN;
+	options.redisUrl ??= env.UPSTASH_REDIS_REST_URL;
+	// TODO error unable to parse response body
+	const client = new Redis({
+		token: options.redisToken,
+		url: options.redisUrl,
+		latencyLogging: true,
+		responseEncoding: false,
+		automaticDeserialization: true,
 	});
-	await client.connect();
 	return betterAuth({
 		basePath: '/v1/auth',
 		database: {
@@ -50,15 +45,12 @@ export async function createAuth(options?: CreateAuthOptions) {
 		},
 		secondaryStorage: {
 			get: async (key) => {
-				return await client.get(key);
+				return client.get(key);
 			},
 			set: async (key, value, ttl) => {
 				if (ttl) {
-					await client.set(key, value, { EX: ttl });
-				}
-				// or for ioredis:
-				// if (ttl) await redis.set(key, value, 'EX', ttl)
-				else {
+					await client.set(key, value, { ex: ttl });
+				} else {
 					await client.set(key, value);
 				}
 			},

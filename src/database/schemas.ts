@@ -203,7 +203,7 @@ export const round = pgTable(
 );
 
 export const roundItem = pgTable(
-	'order_item',
+	'round_item',
 	(t) => ({
 		roundItemId: t.bigserial('round_item_id', { mode: 'bigint' }).primaryKey(),
 		productId: t.bigint('product_id', { mode: 'bigint' }).notNull(),

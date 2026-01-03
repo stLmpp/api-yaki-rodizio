@@ -31,7 +31,7 @@ export function roundModule() {
 		)
 		.get(
 			'/tables/:tableId/latest',
-			async ({ params, db }) => {
+			async ({ params, db, status }) => {
 				const w = db.$with('latest_round').as(
 					db
 						.select({ latestRoundId: db.schema.round.roundId })
@@ -64,6 +64,10 @@ export function roundModule() {
 						eq(db.schema.roundItem.roundId, db.schema.round.roundId),
 					)
 					.innerJoin(
+						db.schema.product,
+						eq(db.schema.product.productId, db.schema.roundItem.productId),
+					)
+					.innerJoin(
 						db.schema.order,
 						eq(db.schema.order.orderId, db.schema.round.orderId),
 					)
@@ -79,9 +83,25 @@ export function roundModule() {
 							isNull(db.schema.roundItem.deletedAt),
 						),
 					)
-					.orderBy(desc(db.schema.round.createdAt));
+					.orderBy(desc(db.schema.roundItem.roundItemId));
 
-				return r;
+				const firstRound = r.at(0);
+
+				if (!firstRound) {
+					return status(404);
+				}
+
+				return {
+					round: {
+						...firstRound.round,
+						order: firstRound.order,
+						table: firstRound.table,
+						roundItems: r.map((item) => ({
+							...item.round_item,
+							product: item.product,
+						})),
+					},
+				};
 			},
 			{
 				params: z.object({
