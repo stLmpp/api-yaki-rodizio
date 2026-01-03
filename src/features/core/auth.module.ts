@@ -7,7 +7,7 @@ function createAuth() {
 	return _createAuth({
 		redisPort: env.REDIS_PORT,
 		redisPassword: env.REDIS_PASSWORD,
-		connectionString: env.DATABASE_URL,
+		connectionString: env.BETTER_AUTH_DATABASE_URL,
 		redisHost: env.REDIS_HOST,
 		redisUsername: env.REDIS_USERNAME,
 	});

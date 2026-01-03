@@ -16,7 +16,7 @@ interface CreateAuthOptions {
 
 export async function createAuth(options?: CreateAuthOptions) {
 	options ??= {};
-	options.connectionString ??= env.DATABASE_URL;
+	options.connectionString ??= env.BETTER_AUTH_DATABASE_URL;
 	options.redisUsername ??= env.REDIS_USERNAME;
 	options.redisPassword ??= env.REDIS_PASSWORD;
 	options.redisHost ??= env.REDIS_HOST;

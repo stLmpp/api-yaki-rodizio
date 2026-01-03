@@ -19,11 +19,35 @@ export const relations = defineRelations(schemas, (r) => ({
 			from: r.order.tableId,
 			to: r.table.tableId,
 		}),
+		rounds: r.many.round({
+			from: r.order.orderId,
+			to: r.round.orderId,
+		}),
 	},
 	table: {
 		orders: r.many.order({
 			from: r.table.tableId,
 			to: r.order.tableId,
+		}),
+	},
+	round: {
+		order: r.one.order({
+			from: r.round.orderId,
+			to: r.order.orderId,
+		}),
+		roundItems: r.many.roundItem({
+			from: r.round.roundId,
+			to: r.roundItem.roundId,
+		}),
+	},
+	roundItem: {
+		product: r.one.product({
+			from: r.roundItem.productId,
+			to: r.product.productId,
+		}),
+		round: r.one.round({
+			from: r.roundItem.roundId,
+			to: r.round.roundId,
 		}),
 	},
 }));

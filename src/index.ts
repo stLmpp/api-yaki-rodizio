@@ -1,11 +1,23 @@
+import Elysia from 'elysia';
 import { CloudflareAdapter } from 'elysia/adapter/cloudflare-worker';
-import { orderModule } from './features/order/order.module.js';
 import openapi from '@elysiajs/openapi';
 import { authModule } from './features/core/auth.module.js';
-import Elysia from 'elysia';
+import { roundModule } from './features/round/round.module.js';
+import { z, ZodAny } from 'zod';
 
-const plugins = [openapi()];
-const features = [authModule(), orderModule()];
+const plugins = [
+	openapi({
+		provider: 'swagger-ui',
+		path: '/openapi',
+		mapJsonSchema: {
+			zod: (schema: ZodAny) =>
+				z.toJSONSchema(schema, {
+					unrepresentable: 'any',
+				}),
+		},
+	}),
+];
+const features = [authModule(), roundModule()];
 
 export default new Elysia({
 	adapter: CloudflareAdapter,
