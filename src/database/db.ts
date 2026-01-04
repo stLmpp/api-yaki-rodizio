@@ -1,17 +1,22 @@
-import { drizzle } from 'drizzle-orm/postgres-js';
+import { drizzle } from 'drizzle-orm/neon-http';
 import * as schema from './schemas.js';
 import { relations } from './relations.js';
-import postgres from 'postgres';
+import { neon, neonConfig } from '@neondatabase/serverless';
+
+// TODO
+neonConfig.fetchEndpoint = 'http://localhost:5432/sql';
+neonConfig.useSecureWebSocket = false;
+neonConfig.poolQueryViaFetch = true;
 
 export function createDb(connectionString: string) {
-	const pool = postgres(connectionString);
+	const db = neon(connectionString);
 
 	return {
 		db: Object.assign(
 			drizzle({
 				schema,
 				relations,
-				client: pool,
+				client: db,
 				casing: 'snake_case',
 				logger: true,
 			}),
@@ -19,6 +24,6 @@ export function createDb(connectionString: string) {
 				schema,
 			},
 		),
-		client: pool,
+		client: db,
 	};
 }

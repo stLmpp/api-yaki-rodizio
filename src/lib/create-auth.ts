@@ -1,10 +1,10 @@
 import { Redis } from '@upstash/redis/cloudflare';
 import { betterAuth } from 'better-auth';
-import { PostgresJSDialect } from 'kysely-postgres-js';
-import postgres from 'postgres';
 import { admin, anonymous, openAPI } from 'better-auth/plugins';
 import { Kysely } from 'kysely';
 import { env } from 'cloudflare:workers';
+import { NeonDialect } from 'kysely-neon';
+import { neon, neonConfig } from '@neondatabase/serverless';
 
 interface CreateAuthOptions {
 	connectionString?: string;
@@ -12,25 +12,28 @@ interface CreateAuthOptions {
 	redisUrl?: string;
 }
 
+// TODO
+neonConfig.fetchEndpoint = 'http://localhost:5432/sql';
+neonConfig.useSecureWebSocket = false;
+neonConfig.poolQueryViaFetch = true;
+
 export function createAuth(options?: CreateAuthOptions) {
 	options ??= {};
 	options.connectionString ??= env.BETTER_AUTH_DATABASE_URL;
 	options.redisToken ??= env.UPSTASH_REDIS_REST_TOKEN;
 	options.redisUrl ??= env.UPSTASH_REDIS_REST_URL;
-	// TODO error unable to parse response body
 	const client = new Redis({
 		token: options.redisToken,
 		url: options.redisUrl,
 		latencyLogging: true,
 		responseEncoding: false,
-		automaticDeserialization: true,
 	});
 	return betterAuth({
 		basePath: '/v1/auth',
 		database: {
 			db: new Kysely({
-				dialect: new PostgresJSDialect({
-					postgres: postgres(options.connectionString),
+				dialect: new NeonDialect({
+					neon: neon(options.connectionString),
 				}),
 				log: ['query', 'error'],
 			}),

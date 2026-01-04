@@ -103,47 +103,41 @@ export class NullGenerator extends AbstractGenerator<{}> {
 }
 
 (async () => {
-	const { db, client } = createDb(process.env.DATABASE_URL!);
-	try {
-		await reset(db, schemas);
-		await seed(db, schemas, {
-			count: 100,
-		}).refine((r) => {
-			const tables = Object.fromEntries(
-				Object.entries(schemas)
-					.filter(([, schema]) => schema instanceof PgTable)
-					.map(([key]) => [
-						key,
-						{
-							columns: {
-								deletedAt: new NullGenerator(),
-							},
+	const { db } = createDb(process.env.DATABASE_URL!);
+	await reset(db, schemas);
+	await seed(db, schemas, {
+		count: 100,
+	}).refine((r) => {
+		const tables = Object.fromEntries(
+			Object.entries(schemas)
+				.filter(([, schema]) => schema instanceof PgTable)
+				.map(([key]) => [
+					key,
+					{
+						columns: {
+							deletedAt: new NullGenerator(),
 						},
-					]),
-			);
-			return {
-				...tables,
-				constraint: {
-					...tables.constraint,
-					columns: {
-						constraintType: r.valuesFromArray({
-							values: ['MIN', 'MAX'],
-						}),
 					},
+				]),
+		);
+		return {
+			...tables,
+			constraint: {
+				...tables.constraint,
+				columns: {
+					constraintType: r.valuesFromArray({
+						values: ['MIN', 'MAX'],
+					}),
 				},
-				roundItem: {
-					...tables.roundItem,
-					columns: {
-						quantity: r.int({ minValue: 1, maxValue: 100 }),
-						...tables.roundItem.columns,
-					},
-					count: 200,
+			},
+			roundItem: {
+				...tables.roundItem,
+				columns: {
+					quantity: r.int({ minValue: 1, maxValue: 100 }),
+					...tables.roundItem.columns,
 				},
-			};
-		});
-	} catch (e) {
-		throw e;
-	} finally {
-		await client.end();
-	}
+				count: 200,
+			},
+		};
+	});
 })();
