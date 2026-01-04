@@ -1,0 +1,22 @@
+version: '3'
+services:
+  redis:
+    image: redis:latest
+    ports:
+      - '6379:6379'
+  serverless-redis-http:
+    ports:
+      - '8079:80'
+    image: hiett/serverless-redis-http:latest
+    environment:
+      SRH_MODE: env
+      SRH_TOKEN: redis_pass
+      SRH_CONNECTION_STRING: 'redis://default@127.0.0.1:6379'
+  neon-db:
+    image: neondatabase/neon_local:latest
+    ports:
+      - '5432:5432'
+    environment:
+      NEON_API_KEY: ${NEON_API_KEY}
+      NEON_PROJECT_ID: round-scene-66515808
+      BRANCH_ID: br-steep-voice-acnabhdx
