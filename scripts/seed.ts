@@ -103,7 +103,7 @@ export class NullGenerator extends AbstractGenerator<{}> {
 }
 
 (async () => {
-	const { db } = createDb(process.env.DATABASE_URL!);
+	const db = createDb(process.env.DATABASE_URL!);
 	await reset(db, schemas);
 	await seed(db, schemas, {
 		count: 100,

@@ -1,72 +1,18 @@
 import { createModule } from '../core/create-module.js';
-import { z } from 'zod';
 import { and, desc, eq, isNull } from 'drizzle-orm';
+import { type } from 'arktype';
 
 export function roundModule() {
 	return createModule({
 		name: 'rounds',
 		prefix: 'v1/rounds',
-	})
-		.get(
-			'/:roundId/items',
-			async ({ params, db }) => {
-				const orderItems = await db.query.roundItem.findMany({
-					where: {
-						roundId: params.roundId,
-						deletedAt: {
-							isNull: true,
-						},
-					},
-				});
-				return {
-					orderItems,
-				};
-			},
-			{
-				auth: true,
-				params: z.object({
-					roundId: z.coerce.bigint(),
-				}),
-			},
-		)
-		.get(
-			'/tables/:tableId/latest',
-			async ({ params, db, status }) => {
-				const w = db.$with('latest_round').as(
-					db
-						.select({ latestRoundId: db.schema.round.roundId })
-						.from(db.schema.round)
-						.innerJoin(
-							db.schema.order,
-							eq(db.schema.order.orderId, db.schema.round.orderId),
-						)
-						.innerJoin(
-							db.schema.table,
-							eq(db.schema.table.tableId, db.schema.order.tableId),
-						)
-						.where(
-							and(
-								eq(db.schema.table.tableId, params.tableId),
-								isNull(db.schema.round.deletedAt),
-								isNull(db.schema.order.deletedAt),
-							),
-						)
-						.orderBy(desc(db.schema.round.roundId))
-						.limit(1),
-				);
-				const r = await db
-					.with(w)
-					.select()
+	}).get(
+		'/tables/:tableId/latest',
+		async ({ params, db, status }) => {
+			const withLatestRound = db.$with('latest_round').as(
+				db
+					.select({ latestRoundId: db.schema.round.roundId })
 					.from(db.schema.round)
-					.innerJoin(w, eq(db.schema.round.roundId, w.latestRoundId))
-					.innerJoin(
-						db.schema.roundItem,
-						eq(db.schema.roundItem.roundId, db.schema.round.roundId),
-					)
-					.innerJoin(
-						db.schema.product,
-						eq(db.schema.product.productId, db.schema.roundItem.productId),
-					)
 					.innerJoin(
 						db.schema.order,
 						eq(db.schema.order.orderId, db.schema.round.orderId),
@@ -80,34 +26,78 @@ export function roundModule() {
 							eq(db.schema.table.tableId, params.tableId),
 							isNull(db.schema.round.deletedAt),
 							isNull(db.schema.order.deletedAt),
-							isNull(db.schema.roundItem.deletedAt),
 						),
 					)
-					.orderBy(desc(db.schema.roundItem.roundItemId));
+					.orderBy(desc(db.schema.round.roundId))
+					.limit(1),
+			);
+			const results = await db
+				.with(withLatestRound)
+				.select()
+				.from(db.schema.round)
+				.innerJoin(
+					withLatestRound,
+					eq(db.schema.round.roundId, withLatestRound.latestRoundId),
+				)
+				.innerJoin(
+					db.schema.roundItem,
+					eq(db.schema.roundItem.roundId, db.schema.round.roundId),
+				)
+				.innerJoin(
+					db.schema.product,
+					eq(db.schema.product.productId, db.schema.roundItem.productId),
+				)
+				.innerJoin(
+					db.schema.order,
+					eq(db.schema.order.orderId, db.schema.round.orderId),
+				)
+				.innerJoin(
+					db.schema.table,
+					eq(db.schema.table.tableId, db.schema.order.tableId),
+				)
+				.where(
+					and(
+						eq(db.schema.table.tableId, params.tableId),
+						isNull(db.schema.round.deletedAt),
+						isNull(db.schema.order.deletedAt),
+						isNull(db.schema.roundItem.deletedAt),
+					),
+				)
+				.orderBy(desc(db.schema.roundItem.roundItemId));
 
-				const firstRound = r.at(0);
+			const first = results.at(0);
 
-				if (!firstRound) {
-					return status(404);
-				}
+			if (!first) {
+				throw status(404, {});
+			}
 
-				return {
-					round: {
-						...firstRound.round,
-						order: firstRound.order,
-						table: firstRound.table,
-						roundItems: r.map((item) => ({
-							...item.round_item,
-							product: item.product,
-						})),
-					},
-				};
-			},
-			{
-				params: z.object({
-					tableId: z.coerce.bigint(),
+			return {
+				round: {},
+			};
+
+			// return {
+			// 	round: {
+			// 		...first.round,
+			// 		order: first.order,
+			// 		table: first.table,
+			// 		roundItems: results.map((item) => ({
+			// 			...item.round_item,
+			// 			product: item.product,
+			// 		})),
+			// 	},
+			// };
+		},
+		{
+			params: type({
+				tableId: type('string.integer', '=>', BigInt),
+			}),
+			auth: true,
+			response: {
+				200: type({
+					round: type({}),
 				}),
-				auth: true,
+				404: type({}),
 			},
-		);
+		},
+	);
 }

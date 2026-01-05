@@ -1,29 +1,21 @@
 import { drizzle } from 'drizzle-orm/neon-http';
 import * as schema from './schemas.js';
 import { relations } from './relations.js';
-import { neon, neonConfig } from '@neondatabase/serverless';
-
-// TODO
-neonConfig.fetchEndpoint = 'http://localhost:5432/sql';
-neonConfig.useSecureWebSocket = false;
-neonConfig.poolQueryViaFetch = true;
+import { createNeonClient } from './create-neon-client.js';
 
 export function createDb(connectionString: string) {
-	const db = neon(connectionString);
+	const neonClient = createNeonClient(connectionString);
 
-	return {
-		db: Object.assign(
-			drizzle({
-				schema,
-				relations,
-				client: db,
-				casing: 'snake_case',
-				logger: true,
-			}),
-			{
-				schema,
-			},
-		),
-		client: db,
-	};
+	return Object.assign(
+		drizzle({
+			schema,
+			relations,
+			client: neonClient,
+			casing: 'snake_case',
+			logger: true,
+		}),
+		{
+			schema,
+		},
+	);
 }

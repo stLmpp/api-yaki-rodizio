@@ -4,18 +4,13 @@ import { admin, anonymous, openAPI } from 'better-auth/plugins';
 import { Kysely } from 'kysely';
 import { env } from 'cloudflare:workers';
 import { NeonDialect } from 'kysely-neon';
-import { neon, neonConfig } from '@neondatabase/serverless';
+import { createNeonClient } from '../database/create-neon-client.js';
 
 interface CreateAuthOptions {
 	connectionString?: string;
 	redisToken?: string;
 	redisUrl?: string;
 }
-
-// TODO
-neonConfig.fetchEndpoint = 'http://localhost:5432/sql';
-neonConfig.useSecureWebSocket = false;
-neonConfig.poolQueryViaFetch = true;
 
 export function createAuth(options?: CreateAuthOptions) {
 	options ??= {};
@@ -25,22 +20,20 @@ export function createAuth(options?: CreateAuthOptions) {
 	const client = new Redis({
 		token: options.redisToken,
 		url: options.redisUrl,
-		latencyLogging: true,
-		responseEncoding: false,
 	});
 	return betterAuth({
 		basePath: '/v1/auth',
 		database: {
 			db: new Kysely({
 				dialect: new NeonDialect({
-					neon: neon(options.connectionString),
+					neon: createNeonClient(options.connectionString),
 				}),
+				// TODO
 				log: ['query', 'error'],
 			}),
 			type: 'postgres',
 			casing: 'snake',
 			transaction: true,
-			debugLogs: false,
 		},
 		plugins: [anonymous(), admin(), openAPI()],
 		experimental: {

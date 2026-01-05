@@ -142,7 +142,7 @@ export const order = pgTable(
 		...common,
 	}),
 	(t) => [
-		index().on(t.tableId, t.orderStatusId),
+		index().on(t.tableId),
 		foreignKey({
 			columns: [t.tableId],
 			foreignColumns: [table.tableId],
@@ -190,7 +190,7 @@ export const round = pgTable(
 		...common,
 	}),
 	(t) => [
-		index().on(t.roundStatusId, t.orderId),
+		index().on(t.orderId),
 		foreignKey({
 			columns: [t.orderId],
 			foreignColumns: [order.orderId],
