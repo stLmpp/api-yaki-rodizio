@@ -1,6 +1,16 @@
 import { createModule } from '../core/create-module.js';
 import { and, desc, eq, isNull } from 'drizzle-orm';
 import { type } from 'arktype';
+import { errorsSchemas } from '../core/errors.schemas.js';
+import { createErrors } from '../core/create-errors.js';
+
+const errors = createErrors({
+	roundNotFound: {
+		code: 'ROUND-0001',
+		message: 'Round not found.',
+		status: 404,
+	},
+});
 
 export function roundModule() {
 	return createModule({
@@ -8,7 +18,7 @@ export function roundModule() {
 		prefix: 'v1/rounds',
 	}).get(
 		'/tables/:tableId/latest',
-		async ({ params, db, status }) => {
+		async ({ params, db }) => {
 			const withLatestRound = db.$with('latest_round').as(
 				db
 					.select({ latestRoundId: db.schema.round.roundId })
@@ -68,7 +78,7 @@ export function roundModule() {
 			const first = results.at(0);
 
 			if (!first) {
-				throw status(404, {});
+				return errors.roundNotFound();
 			}
 
 			return {
@@ -93,10 +103,10 @@ export function roundModule() {
 			}),
 			auth: true,
 			response: {
+				...errorsSchemas,
 				200: type({
 					round: type({}),
 				}),
-				404: type({}),
 			},
 		},
 	);

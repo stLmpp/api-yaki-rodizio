@@ -187,6 +187,7 @@ export const round = pgTable(
 		roundId: t.bigserial('round_id', { mode: 'bigint' }).primaryKey(),
 		orderId: t.bigint('order_id', { mode: 'bigint' }).notNull(),
 		roundStatusId: t.varchar('round_status_id', { length: 23 }).notNull(),
+		roundNumber: t.smallint('round_number').notNull(),
 		...common,
 	}),
 	(t) => [
