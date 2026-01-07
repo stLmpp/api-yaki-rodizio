@@ -27,6 +27,7 @@
 	},
 	"dependencies": {
 		"@elysiajs/openapi": "^1.4.13",
+		"@elysiajs/server-timing": "^1.4.0",
 		"@neondatabase/serverless": "^1.0.2",
 		"@sinclair/typebox": "^0.34.46",
 		"@upstash/redis": "~1.36.0",

@@ -13,6 +13,7 @@ const common = {
 		.defaultNow()
 		.$onUpdateFn(() => new Date()),
 	deletedAt: timestamp('deleted_at'),
+	// TODO find a way to automate this
 	createdBy: text('created_by').notNull().default('unknown'),
 	updatedBy: text('updated_by').default('unknown'),
 };
