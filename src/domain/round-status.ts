@@ -1,6 +1,5 @@
-export const OrderStatus = {
+export const RoundStatus = {
 	Waiting: 'WAITING',
 	Serving: 'SERVING',
 	Finished: 'FINISHED',
-	Cancelled: 'CANCELLED',
 } as const;

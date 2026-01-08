@@ -34,6 +34,7 @@ export const relations = defineRelations(schemas, (r) => ({
 		order: r.one.order({
 			from: r.round.orderId,
 			to: r.order.orderId,
+			optional: false,
 		}),
 		roundItems: r.many.roundItem({
 			from: r.round.roundId,

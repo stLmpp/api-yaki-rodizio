@@ -8,5 +8,5 @@ export function roundModule() {
 		prefix: 'v1/rounds',
 	})
 		.use(getLatestRoundController)
-		.group('', () => postCloseRoundController);
+		.use(postCloseRoundController);
 }

@@ -1,17 +1,9 @@
 import { createModule } from '../core/create-module.js';
 import { and, desc, eq, isNull } from 'drizzle-orm';
-import { createErrors } from '../core/create-errors.js';
 import { type } from 'arktype';
 import { errorsSchemas } from '../core/errors.schemas.js';
 import { bigintParamType } from '../../lib/types.js';
-
-const errors = createErrors({
-	roundNotFound: {
-		code: 'ROUND-0001',
-		message: 'Round not found.',
-		status: 404,
-	},
-});
+import { roundErrors } from './round-errors.js';
 
 export const getLatestRoundController = createModule().get(
 	'/tables/:tableId/latest',
@@ -75,7 +67,7 @@ export const getLatestRoundController = createModule().get(
 		const first = results.at(0);
 
 		if (!first) {
-			return errors.roundNotFound();
+			return roundErrors.roundNotFound();
 		}
 
 		return {
