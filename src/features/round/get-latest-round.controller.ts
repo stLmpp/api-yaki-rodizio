@@ -1,7 +1,6 @@
 import { createModule } from '../core/create-module.js';
 import { and, desc, eq, isNull } from 'drizzle-orm';
 import { type } from 'arktype';
-import { errorsSchemas } from '../core/errors.schemas.js';
 import { bigintParamType } from '../../lib/types.js';
 import { roundErrors } from './round-errors.js';
 
@@ -54,12 +53,21 @@ export const getLatestRoundController = createModule().get(
 				db.schema.table,
 				eq(db.schema.table.tableId, db.schema.order.tableId),
 			)
+			.innerJoin(
+				db.schema.productCategory,
+				eq(
+					db.schema.productCategory.productCategoryId,
+					db.schema.product.productCategoryId,
+				),
+			)
 			.where(
 				and(
 					eq(db.schema.table.tableId, params.tableId),
 					isNull(db.schema.round.deletedAt),
 					isNull(db.schema.order.deletedAt),
 					isNull(db.schema.roundItem.deletedAt),
+					isNull(db.schema.product.deletedAt),
+					isNull(db.schema.productCategory.deletedAt),
 				),
 			)
 			.orderBy(desc(db.schema.roundItem.roundItemId));
@@ -70,32 +78,33 @@ export const getLatestRoundController = createModule().get(
 			return roundErrors.roundNotFound();
 		}
 
-		return {
-			round: {},
-		};
-
 		// return {
-		// 	round: {
-		// 		...first.round,
-		// 		order: first.order,
-		// 		table: first.table,
-		// 		roundItems: results.map((item) => ({
-		// 			...item.round_item,
-		// 			product: item.product,
-		// 		})),
-		// 	},
+		// 	round: {},
 		// };
+
+		return {
+			round: {
+				...first.round,
+				order: first.order,
+				table: first.table,
+				roundItems: results.map((item) => ({
+					...item.round_item,
+					product: item.product,
+					productCategory: item.product_category,
+				})),
+			},
+		};
 	},
 	{
 		params: type({
 			tableId: bigintParamType,
 		}),
 		auth: true,
-		response: {
-			...errorsSchemas,
-			200: type({
-				round: type({}),
-			}),
-		},
+		// response: {
+		// 	...errorsSchemas,
+		// 	200: type({
+		// 		round: type({}),
+		// 	}),
+		// },
 	},
 );

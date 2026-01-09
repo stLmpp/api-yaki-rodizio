@@ -21,4 +21,14 @@ export const roundErrors = createErrors({
 		message: 'Order already finished.',
 		status: 422,
 	},
+	roundItemNotFound: {
+		code: 'ROUND-0005',
+		message: 'Round item not found.',
+		status: 404,
+	},
+	roundIsNotWaiting: {
+		code: 'ROUND-0006',
+		message: 'Round is not waiting.',
+		status: 422,
+	},
 });

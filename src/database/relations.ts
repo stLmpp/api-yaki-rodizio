@@ -7,11 +7,53 @@ export const relations = defineRelations(schemas, (r) => ({
 			from: r.product.productCategoryId,
 			to: r.productCategory.productCategoryId,
 		}),
+		productConstraints: r.many.productConstraint({
+			from: r.product.productId,
+			to: r.productConstraint.productId,
+		}),
+	},
+	productConstraint: {
+		product: r.one.product({
+			from: r.productConstraint.productId,
+			to: r.product.productId,
+			optional: false,
+		}),
+		constraint: r.one.constraint({
+			from: r.productConstraint.constraintId,
+			to: r.constraint.constraintId,
+			optional: false,
+		}),
+	},
+	productCategoryConstraint: {
+		productCategory: r.one.productCategory({
+			from: r.productCategoryConstraint.productCategoryId,
+			to: r.productCategory.productCategoryId,
+			optional: false,
+		}),
+		constraint: r.one.constraint({
+			from: r.productCategoryConstraint.constraintId,
+			to: r.constraint.constraintId,
+			optional: false,
+		}),
 	},
 	productCategory: {
 		products: r.many.product({
 			from: r.productCategory.productCategoryId,
 			to: r.product.productCategoryId,
+		}),
+		productCategoryConstraints: r.many.productCategoryConstraint({
+			from: r.productCategory.productCategoryId,
+			to: r.productCategoryConstraint.productCategoryId,
+		}),
+	},
+	constraint: {
+		productCategoryConstraints: r.many.productCategoryConstraint({
+			from: r.constraint.constraintId,
+			to: r.productCategoryConstraint.constraintId,
+		}),
+		productConstraint: r.many.productConstraint({
+			from: r.constraint.constraintId,
+			to: r.productConstraint.constraintId,
 		}),
 	},
 	order: {
@@ -49,6 +91,7 @@ export const relations = defineRelations(schemas, (r) => ({
 		round: r.one.round({
 			from: r.roundItem.roundId,
 			to: r.round.roundId,
+			optional: false,
 		}),
 	},
 }));

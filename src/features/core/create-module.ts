@@ -11,7 +11,7 @@ export function createModule<const BasePath extends string = ''>(
 	return new Elysia(config)
 		.use(authModule())
 		.resolve(({ set, headers: _headers }) => {
-			const headers = _headers as Record<string, string>;
+			const headers = _headers as Record<string, string | undefined>;
 			const correlationId =
 				headers['x-correlation-id'] ??
 				headers['cf-request-id'] ??

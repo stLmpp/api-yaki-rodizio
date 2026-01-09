@@ -3,6 +3,8 @@ import { type } from 'arktype';
 import { bigintParamType } from '../../lib/types.js';
 import { and, eq } from 'drizzle-orm';
 import { errorsSchemas } from '../core/errors.schemas.js';
+import { roundErrors } from './round-errors.js';
+import { RoundStatus } from '../../domain/round-status.js';
 
 export const postUpsertRoundItemController = createModule().post(
 	'/:roundId/item',
@@ -15,9 +17,7 @@ export const postUpsertRoundItemController = createModule().post(
 					roundId: params.roundId,
 				},
 			});
-			if (roundItem) {
-				body.roundItemId = roundItem.roundItemId;
-			} else {
+			if (!roundItem) {
 				const [roundItem] = await db
 					.insert(db.schema.roundItem)
 					.values({
@@ -28,8 +28,32 @@ export const postUpsertRoundItemController = createModule().post(
 					.returning({ roundItemId: db.schema.roundItem.roundItemId });
 				return { roundItemId: roundItem.roundItemId };
 			}
+			body.roundItemId = roundItem.roundItemId;
 		}
 		if (body.roundItemId) {
+			const roundItem = await db.query.roundItem.findFirst({
+				columns: {
+					roundItemId: true,
+				},
+				where: {
+					roundItemId: body.roundItemId,
+					deletedAt: { isNull: true },
+					round: { deletedAt: { isNull: true } },
+				},
+				with: {
+					round: {
+						columns: {
+							roundStatusId: true,
+						},
+					},
+				},
+			});
+			if (!roundItem) {
+				return roundErrors.roundItemNotFound();
+			}
+			if (roundItem.round.roundStatusId !== RoundStatus.Waiting) {
+				return roundErrors.roundIsNotWaiting();
+			}
 			await db
 				.update(db.schema.roundItem)
 				.set({
@@ -43,15 +67,15 @@ export const postUpsertRoundItemController = createModule().post(
 		auth: true,
 		params: type({ roundId: bigintParamType }),
 		body: type({
-			'roundItemId?': 'bigint',
-			productId: 'bigint',
-			roundId: 'bigint',
+			'roundItemId?': bigintParamType,
+			productId: bigintParamType,
+			roundId: bigintParamType,
 			quantity: 'number.integer >= 1',
 		}),
 		response: {
 			...errorsSchemas,
 			200: type({
-				roundItemId: 'bigint',
+				roundItemId: bigintParamType,
 			}),
 		},
 	},
