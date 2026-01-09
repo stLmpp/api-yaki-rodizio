@@ -223,5 +223,6 @@ export const roundItem = pgTable(
 			columns: [t.roundId],
 			foreignColumns: [round.roundId],
 		}),
+		index().on(t.productId, t.roundId),
 	],
 );

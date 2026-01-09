@@ -11,7 +11,7 @@
 		"cf-typegen": "wrangler types"
 	},
 	"devDependencies": {
-		"@cloudflare/vitest-pool-workers": "^0.8.19",
+		"@cloudflare/vitest-pool-workers": "^0.12.1",
 		"@eslint/js": "^9.39.2",
 		"@types/node": "^22.19.3",
 		"dotenv": "^17.2.3",
@@ -21,20 +21,20 @@
 		"prettier": "^3.7.4",
 		"tsx": "^4.21.0",
 		"typescript": "^5.5.2",
-		"typescript-eslint": "^8.51.0",
-		"vitest": "~3.2.0",
-		"wrangler": "^4.54.0"
+		"typescript-eslint": "^8.52.0",
+		"vitest": "~4.0.16",
+		"wrangler": "^4.58.0"
 	},
 	"dependencies": {
 		"@elysiajs/openapi": "^1.4.13",
 		"@elysiajs/server-timing": "^1.4.0",
 		"@neondatabase/serverless": "^1.0.2",
-		"@sinclair/typebox": "^0.34.46",
-		"@upstash/redis": "~1.36.0",
+		"@sinclair/typebox": "^0.34.47",
+		"@upstash/redis": "~1.36.1",
 		"arktype": "^2.1.29",
 		"better-auth": "~1.4.10",
 		"drizzle-orm": "1.0.0-beta.8-734e789",
-		"elysia": "^1.4.19",
+		"elysia": "^1.4.21",
 		"kysely": "^0.28.9",
 		"kysely-neon": "^2.0.2",
 		"openapi-types": "^12.1.3"
