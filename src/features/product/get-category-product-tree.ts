@@ -3,7 +3,7 @@ import { ConstraintType } from '../../domain/constraint-type.js';
 import { errorsSchemas } from '../core/errors.schemas.js';
 import { type } from 'arktype';
 
-export const getProductWithCategoriesTree = createModule().get(
+export const getCategoryProductTree = createModule().get(
 	'/categories-tree',
 	async ({ db }) => {
 		const categories = await db.query.productCategory.findMany({

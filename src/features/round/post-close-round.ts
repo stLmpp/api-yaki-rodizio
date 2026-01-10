@@ -7,7 +7,7 @@ import { RoundStatus } from '../../domain/round-status.js';
 import { and, inArray } from 'drizzle-orm';
 import { errorsSchemas } from '../core/errors.schemas.js';
 
-export const postCloseRoundController = createModule().post(
+export const postCloseRound = createModule().post(
 	'/:roundId/next',
 	async ({ params, db }) => {
 		const round = await db.query.round.findFirst({

@@ -6,7 +6,7 @@ import { errorsSchemas } from '../core/errors.schemas.js';
 import { roundErrors } from './round-errors.js';
 import { RoundStatus } from '../../domain/round-status.js';
 
-export const postUpsertRoundItemController = createModule().post(
+export const postUpsertRoundItem = createModule().post(
 	'/:roundId/item',
 	async ({ params, body, db }) => {
 		if (body.roundItemId === undefined) {

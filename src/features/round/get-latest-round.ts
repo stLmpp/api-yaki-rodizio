@@ -4,7 +4,7 @@ import { type } from 'arktype';
 import { bigintParamType } from '../../lib/types.js';
 import { roundErrors } from './round-errors.js';
 
-export const getLatestRoundController = createModule().get(
+export const getLatestRound = createModule().get(
 	'/tables/:tableId/latest',
 	async ({ params, db }) => {
 		const withLatestRound = db.$with('latest_round').as(

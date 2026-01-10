@@ -6,7 +6,7 @@ import { roundErrors } from './round-errors.js';
 import { RoundStatus } from '../../domain/round-status.js';
 import { and, eq } from 'drizzle-orm';
 
-export const patchUpdateRoundStatusController = createModule().patch(
+export const patchUpdateRoundStatus = createModule().patch(
 	'/:roundId/status',
 	async ({ params, db, body }) => {
 		const round = await db.query.round.findFirst({

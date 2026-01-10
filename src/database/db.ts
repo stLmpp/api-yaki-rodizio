@@ -22,6 +22,10 @@ export function createDb(connectionString: string) {
 	);
 }
 
+/**
+ * Creates a drizzle Postgres client. Only used for seed
+ * @param connectionString
+ */
 export function createDbPgClient(connectionString: string) {
 	const client = new pg.Pool({
 		connectionString,

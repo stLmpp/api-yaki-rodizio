@@ -1,8 +1,8 @@
 import { createModule } from '../core/create-module.js';
-import { getLatestRoundController } from './get-latest-round.controller.js';
-import { postCloseRoundController } from './post-close-round.controller.js';
-import { postUpsertRoundItemController } from './post-upsert-round-item.controller.js';
-import { patchUpdateRoundStatusController } from './patch-update-round-status.controller.js';
+import { getLatestRound } from './get-latest-round.js';
+import { postCloseRound } from './post-close-round.js';
+import { postUpsertRoundItem } from './post-upsert-round-item.js';
+import { patchUpdateRoundStatus } from './patch-update-round-status.js';
 
 export function roundModule() {
 	return createModule({
@@ -10,8 +10,8 @@ export function roundModule() {
 		prefix: 'v1/rounds',
 		tags: ['Rounds'],
 	})
-		.use(getLatestRoundController)
-		.use(postCloseRoundController)
-		.use(postUpsertRoundItemController)
-		.use(patchUpdateRoundStatusController);
+		.use(getLatestRound)
+		.use(postCloseRound)
+		.use(postUpsertRoundItem)
+		.use(patchUpdateRoundStatus);
 }

@@ -1,4 +1,4 @@
-import './arktype.config.js';
+import './config.js';
 import Elysia from 'elysia';
 import { CloudflareAdapter } from 'elysia/adapter/cloudflare-worker';
 import openapi from '@elysiajs/openapi';
@@ -7,16 +7,8 @@ import { roundModule } from './features/round/round.module.js';
 import serverTiming from '@elysiajs/server-timing';
 import { getAuthOpenApi } from './lib/auth-openapi.js';
 import { productModule } from './features/product/product.module.js';
-
-declare global {
-	interface BigInt {
-		toJSON: () => string;
-	}
-}
-
-BigInt.prototype.toJSON = function () {
-	return String(this);
-};
+import { tableModule } from './features/table/table.module.js';
+import { orderModule } from './features/order/order.module.js';
 
 const documentation = await getAuthOpenApi();
 
@@ -32,7 +24,14 @@ const plugins = [
 		},
 	}),
 ];
-const features = [authRoutes, authModule(), roundModule(), productModule()];
+const features = [
+	authRoutes,
+	authModule(),
+	roundModule(),
+	productModule(),
+	tableModule(),
+	orderModule(),
+];
 
 export default new Elysia({
 	adapter: CloudflareAdapter,
