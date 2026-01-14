@@ -27,6 +27,7 @@
 		"wrangler": "^4.58.0"
 	},
 	"dependencies": {
+		"@elysiajs/cors": "~1.4.1",
 		"@elysiajs/openapi": "^1.4.13",
 		"@elysiajs/server-timing": "^1.4.0",
 		"@neondatabase/serverless": "^1.0.2",

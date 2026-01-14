@@ -22,6 +22,7 @@ export function createAuth(options?: CreateAuthOptions) {
 		url: options.redisUrl,
 	});
 	return betterAuth({
+		trustedOrigins: ['http://localhost:4200'], // TODO
 		basePath: '/v1/auth',
 		database: {
 			db: new Kysely({
@@ -57,7 +58,9 @@ export function createAuth(options?: CreateAuthOptions) {
 	});
 }
 
-export enum AuthRole {
-	Admin = 'admin',
-	User = 'user',
-}
+export const AuthRole = {
+	Admin: 'admin',
+	User: 'user',
+} as const;
+
+export type AuthRole = (typeof AuthRole)[keyof typeof AuthRole];

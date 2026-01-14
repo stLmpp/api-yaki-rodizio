@@ -54,6 +54,7 @@ export function authModule() {
 				return {
 					user: session.user,
 					session: session.session,
+					betterAuth,
 				};
 			},
 		}),

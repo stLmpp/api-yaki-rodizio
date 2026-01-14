@@ -3,10 +3,21 @@ import { and, desc, eq, isNull } from 'drizzle-orm';
 import { type } from 'arktype';
 import { bigintParamType } from '../../lib/types.js';
 import { roundErrors } from './round-errors.js';
+import { errorsSchemas } from '../core/errors.schemas.js';
 
 export const getLatestRound = createModule().get(
 	'/tables/:tableId/latest',
 	async ({ params, db }) => {
+		const table = await db.query.table.findFirst({
+			columns: { tableId: true },
+			where: {
+				deletedAt: { isNull: true },
+				tableId: params.tableId,
+			},
+		});
+		if (!table) {
+			return roundErrors.tableNotFound();
+		}
 		const withLatestRound = db.$with('latest_round').as(
 			db
 				.select({ latestRoundId: db.schema.round.roundId })
@@ -84,14 +95,9 @@ export const getLatestRound = createModule().get(
 
 		return {
 			round: {
-				...first.round,
-				order: first.order,
-				table: first.table,
-				roundItems: results.map((item) => ({
-					...item.round_item,
-					product: item.product,
-					productCategory: item.product_category,
-				})),
+				tableId: first.table.tableId,
+				roundId: first.round.roundId,
+				orderId: first.order.orderId,
 			},
 		};
 	},
@@ -100,11 +106,15 @@ export const getLatestRound = createModule().get(
 			tableId: bigintParamType,
 		}),
 		auth: true,
-		// response: {
-		// 	...errorsSchemas,
-		// 	200: type({
-		// 		round: type({}),
-		// 	}),
-		// },
+		response: {
+			...errorsSchemas,
+			200: type({
+				round: type({
+					tableId: 'bigint',
+					roundId: 'bigint',
+					orderId: 'bigint',
+				}),
+			}),
+		},
 	},
 );

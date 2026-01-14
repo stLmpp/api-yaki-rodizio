@@ -9,10 +9,14 @@ import { getAuthOpenApi } from './lib/auth-openapi.js';
 import { productModule } from './features/product/product.module.js';
 import { tableModule } from './features/table/table.module.js';
 import { orderModule } from './features/order/order.module.js';
+import cors from '@elysiajs/cors';
 
 const documentation = await getAuthOpenApi();
 
 const plugins = [
+	cors({
+		origin: '*', // TODO
+	}),
 	serverTiming(),
 	openapi({
 		provider: 'swagger-ui',
@@ -35,6 +39,7 @@ const features = [
 
 export default new Elysia({
 	adapter: CloudflareAdapter,
+	prefix: '/api',
 })
 	.use(plugins)
 	.use(features)

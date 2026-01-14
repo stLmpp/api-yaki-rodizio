@@ -31,4 +31,9 @@ export const roundErrors = createErrors({
 		message: 'Round is not waiting.',
 		status: 422,
 	},
+	tableNotFound: {
+		code: 'ROUND-0007',
+		message: 'Table not found.',
+		status: 422,
+	},
 });
