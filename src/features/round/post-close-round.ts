@@ -1,4 +1,3 @@
-import { createModule } from '../core/create-module.js';
 import { AuthRole } from '../../lib/create-auth.js';
 import { type } from 'arktype';
 import { bigintParamType } from '../../lib/types.js';
@@ -6,8 +5,9 @@ import { roundErrors } from './round-errors.js';
 import { RoundStatus } from '../../domain/round-status.js';
 import { and, inArray } from 'drizzle-orm';
 import { errorsSchemas } from '../core/errors.schemas.js';
+import { createRoute } from '../core/create-route.js';
 
-export const postCloseRound = createModule().post(
+export const postCloseRound = createRoute().post(
 	'/:roundId/next',
 	async ({ params, db }) => {
 		const round = await db.query.round.findFirst({

@@ -1,13 +1,13 @@
-import { createModule } from '../core/create-module.js';
 import { and, desc, eq, isNull } from 'drizzle-orm';
 import { type } from 'arktype';
 import { bigintParamType } from '../../lib/types.js';
 import { roundErrors } from './round-errors.js';
 import { errorsSchemas } from '../core/errors.schemas.js';
+import { createRoute } from '../core/create-route.js';
 
-export const getLatestRound = createModule().get(
+export const getLatestRound = createRoute().get(
 	'/tables/:tableId/latest',
-	async ({ params, db }) => {
+	async function getLatestRound({ params, db }) {
 		const table = await db.query.table.findFirst({
 			columns: { tableId: true },
 			where: {

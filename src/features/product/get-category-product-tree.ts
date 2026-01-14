@@ -1,9 +1,9 @@
-import { createModule } from '../core/create-module.js';
 import { ConstraintType } from '../../domain/constraint-type.js';
 import { errorsSchemas } from '../core/errors.schemas.js';
 import { type } from 'arktype';
+import { createRoute } from '../core/create-route.js';
 
-export const getCategoryProductTree = createModule().get(
+export const getCategoryProductTree = createRoute().get(
 	'/categories-tree',
 	async ({ db }) => {
 		const categories = await db.query.productCategory.findMany({

@@ -2,7 +2,7 @@ import './config.js';
 import Elysia from 'elysia';
 import { CloudflareAdapter } from 'elysia/adapter/cloudflare-worker';
 import openapi from '@elysiajs/openapi';
-import { authModule, authRoutes } from './features/core/auth.module.js';
+import { authRoutes } from './features/core/auth.module.js';
 import { roundModule } from './features/round/round.module.js';
 import serverTiming from '@elysiajs/server-timing';
 import { getAuthOpenApi } from './lib/auth-openapi.js';
@@ -30,7 +30,6 @@ const plugins = [
 ];
 const features = [
 	authRoutes,
-	authModule(),
 	roundModule(),
 	productModule(),
 	tableModule(),

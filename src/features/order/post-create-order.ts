@@ -1,4 +1,3 @@
-import { createModule } from '../core/create-module.js';
 import { AuthRole } from '../../lib/create-auth.js';
 import { bigintParamType } from '../../lib/types.js';
 import { type } from 'arktype';
@@ -7,8 +6,9 @@ import { orderErrors } from './order-errors.js';
 import { OrderStatus } from '../../domain/order-status.js';
 import { RoundStatus } from '../../domain/round-status.js';
 import { inArray } from 'drizzle-orm';
+import { createRoute } from '../core/create-route.js';
 
-export const postCreateOrder = createModule().post(
+export const postCreateOrder = createRoute().post(
 	'/',
 	async ({ db, body }) => {
 		const table = await db.query.table.findFirst({

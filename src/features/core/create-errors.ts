@@ -13,16 +13,20 @@ export function createErrors<
 	>,
 >(value: T) {
 	const errors = {} as {
-		[K in keyof T]: () => ReturnType<
-			typeof status<T[K]['status'], typeof ErrorSchema.infer>
-		>;
+		[K in keyof T]: (
+			details?: string[],
+		) => ReturnType<typeof status<T[K]['status'], typeof ErrorSchema.infer>>;
 	};
 	for (const [key, { status: _status, ...error }] of objectEntries(value)) {
 		if (errorCodes.has(error.code)) {
 			throw new Error(`Duplicate error code: ${error.code}`);
 		}
 		errorCodes.add(error.code);
-		(errors as Record<string, unknown>)[key] = () => status(_status, error);
+		(errors as Record<string, unknown>)[key] = (details?: string[]) =>
+			status(_status, {
+				...error,
+				details,
+			});
 	}
 	return errors;
 }

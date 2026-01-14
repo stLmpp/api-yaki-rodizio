@@ -1,12 +1,12 @@
-import { createModule } from '../core/create-module.js';
 import { bigintParamType } from '../../lib/types.js';
 import { type } from 'arktype';
 import { errorsSchemas } from '../core/errors.schemas.js';
 import { roundErrors } from './round-errors.js';
 import { RoundStatus } from '../../domain/round-status.js';
 import { and, eq } from 'drizzle-orm';
+import { createRoute } from '../core/create-route.js';
 
-export const patchUpdateRoundStatus = createModule().patch(
+export const patchUpdateRoundStatus = createRoute().patch(
 	'/:roundId/status',
 	async ({ params, db, body }) => {
 		const round = await db.query.round.findFirst({

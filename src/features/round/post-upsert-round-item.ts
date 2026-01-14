@@ -1,12 +1,12 @@
-import { createModule } from '../core/create-module.js';
 import { type } from 'arktype';
 import { bigintParamType } from '../../lib/types.js';
 import { and, eq } from 'drizzle-orm';
 import { errorsSchemas } from '../core/errors.schemas.js';
 import { roundErrors } from './round-errors.js';
 import { RoundStatus } from '../../domain/round-status.js';
+import { createRoute } from '../core/create-route.js';
 
-export const postUpsertRoundItem = createModule().post(
+export const postUpsertRoundItem = createRoute().post(
 	'/:roundId/item',
 	async ({ params, body, db }) => {
 		if (body.roundItemId === undefined) {

@@ -1,5 +1,6 @@
 import Elysia from 'elysia';
 import { AuthRole, createAuth } from '../../lib/create-auth.js';
+import { coreErrors } from './core-errors.js';
 
 function hasRequiredRole(
 	requiredRoles: AuthRole[],
@@ -16,47 +17,49 @@ export const authRoutes = new Elysia({ name: 'auth.routes' }).mount(
 	},
 );
 
-export function authModule() {
-	return new Elysia({ name: 'auth' }).macro(
-		'auth',
-		(
-			configOrRoles:
-				| AuthRole[]
-				| true
-				| { allowAnonymous: boolean; roles?: AuthRole[] },
-		) => ({
-			async resolve({ status, request: { headers } }) {
-				const betterAuth = createAuth();
-				const session = await betterAuth.api.getSession({
-					headers,
-				});
+export const authModule = new Elysia({ name: 'auth' }).macro(
+	'auth',
+	(
+		configOrRoles:
+			| AuthRole[]
+			| true
+			| { allowAnonymous: boolean; roles?: AuthRole[] },
+	) => ({
+		resolve: async function authentication({ request: { headers } }) {
+			const betterAuth = createAuth();
+			const session = await betterAuth.api.getSession({
+				headers,
+			});
 
-				if (!session) {
-					return status(401);
+			if (!session) {
+				return coreErrors.unauthorized();
+			}
+
+			if (Array.isArray(configOrRoles)) {
+				if (!hasRequiredRole(configOrRoles, session.user.role)) {
+					return coreErrors.roleNotAllowed([
+						`Role ${configOrRoles} required. Provided: ${session.user.role}.`,
+					]);
 				}
-
-				if (Array.isArray(configOrRoles)) {
-					if (!hasRequiredRole(configOrRoles, session.user.role)) {
-						return status(403);
-					}
-				} else if (typeof configOrRoles === 'object') {
-					if (!configOrRoles.allowAnonymous && session.user.isAnonymous) {
-						return status(403);
-					}
-					if (
-						configOrRoles.roles?.length &&
-						!hasRequiredRole(configOrRoles.roles, session.user.role)
-					) {
-						return status(403);
-					}
+			} else if (typeof configOrRoles === 'object') {
+				if (!configOrRoles.allowAnonymous && session.user.isAnonymous) {
+					return coreErrors.anonymousNotAllowed();
 				}
+				if (
+					configOrRoles.roles?.length &&
+					!hasRequiredRole(configOrRoles.roles, session.user.role)
+				) {
+					return coreErrors.roleNotAllowed([
+						`Role ${configOrRoles.roles} required. Provided: ${session.user.role}.`,
+					]);
+				}
+			}
 
-				return {
-					user: session.user,
-					session: session.session,
-					betterAuth,
-				};
-			},
-		}),
-	);
-}
+			return {
+				user: session.user,
+				session: session.session,
+				betterAuth,
+			};
+		},
+	}),
+);

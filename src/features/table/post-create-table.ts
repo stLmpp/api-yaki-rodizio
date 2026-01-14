@@ -1,9 +1,9 @@
-import { createModule } from '../core/create-module.js';
 import { AuthRole } from '../../lib/create-auth.js';
 import { type } from 'arktype';
 import { errorsSchemas } from '../core/errors.schemas.js';
+import { createRoute } from '../core/create-route.js';
 
-export const postCreateTable = createModule().post(
+export const postCreateTable = createRoute().post(
 	'/',
 	async ({ db, body }) => {
 		const [table] = await db
