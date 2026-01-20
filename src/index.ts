@@ -43,3 +43,5 @@ export default new Elysia({
 	.use(plugins)
 	.use(features)
 	.compile();
+
+// TODO gravar horario de liberacao da proxima rodada na tabela round para que o front-end faca o calculo se a rodada esta liberada ou nao
