@@ -197,6 +197,7 @@ export const orderConstraint = pgTable(
 			.primaryKey()
 			.generatedAlwaysAsIdentity(),
 		constraintId: t.bigint('constraint_id', { mode: 'bigint' }).notNull(),
+		orderId: t.bigint('order_id', { mode: 'bigint' }).notNull(),
 		...common,
 	}),
 	(t) => [
@@ -204,6 +205,11 @@ export const orderConstraint = pgTable(
 		foreignKey({
 			columns: [t.constraintId],
 			foreignColumns: [constraint.constraintId],
+		}),
+		index().on(t.orderId, t.deletedAt),
+		foreignKey({
+			columns: [t.orderId],
+			foreignColumns: [order.orderId],
 		}),
 	],
 );

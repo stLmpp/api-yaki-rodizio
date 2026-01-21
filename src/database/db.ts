@@ -41,6 +41,7 @@ export function createDbPgClient(connectionString: string) {
 		}),
 		{
 			schema,
+			client,
 		},
 	);
 }

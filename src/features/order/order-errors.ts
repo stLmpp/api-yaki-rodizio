@@ -6,4 +6,9 @@ export const orderErrors = createErrors({
 		message: 'Table not found',
 		status: 422,
 	},
+	orderNotFound: {
+		code: 'ORDER-0002',
+		message: 'Order not found',
+		status: 404,
+	},
 });

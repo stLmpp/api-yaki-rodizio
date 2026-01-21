@@ -49,14 +49,6 @@ export const getLatestRound = createRoute().get(
 				eq(db.schema.round.roundId, withLatestRound.latestRoundId),
 			)
 			.innerJoin(
-				db.schema.roundItem,
-				eq(db.schema.roundItem.roundId, db.schema.round.roundId),
-			)
-			.innerJoin(
-				db.schema.product,
-				eq(db.schema.product.productId, db.schema.roundItem.productId),
-			)
-			.innerJoin(
 				db.schema.order,
 				eq(db.schema.order.orderId, db.schema.round.orderId),
 			)
@@ -64,34 +56,19 @@ export const getLatestRound = createRoute().get(
 				db.schema.table,
 				eq(db.schema.table.tableId, db.schema.order.tableId),
 			)
-			.innerJoin(
-				db.schema.productCategory,
-				eq(
-					db.schema.productCategory.productCategoryId,
-					db.schema.product.productCategoryId,
-				),
-			)
 			.where(
 				and(
 					eq(db.schema.table.tableId, params.tableId),
 					isNull(db.schema.round.deletedAt),
 					isNull(db.schema.order.deletedAt),
-					isNull(db.schema.roundItem.deletedAt),
-					isNull(db.schema.product.deletedAt),
-					isNull(db.schema.productCategory.deletedAt),
 				),
-			)
-			.orderBy(desc(db.schema.roundItem.roundItemId));
+			);
 
 		const first = results.at(0);
 
 		if (!first) {
 			return roundErrors.roundNotFound();
 		}
-
-		// return {
-		// 	round: {},
-		// };
 
 		return {
 			round: {
